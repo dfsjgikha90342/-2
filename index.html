@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Доска объявлений | Авито-клон</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: #f3f4f6;
+            color: #1f2937;
+            padding-bottom: 40px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 24px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2563eb, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            background: none;
+            color: #2563eb;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+        }
+
+        .add-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(37,99,235,0.2);
+        }
+
+        .add-btn:hover {
+            background: #1d4ed8;
+            transform: scale(0.97);
+        }
+
+        /* Filters */
+        .filters-section {
+            background: white;
+            margin: 20px 20px 0 20px;
+            padding: 16px 20px;
+            border-radius: 28px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .filter-group label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6b7280;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            background: #f9fafb;
+            transition: 0.2s;
+        }
+
+        .filter-group input:focus, .filter-group select:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: white;
+        }
+
+        .search-btn {
+            background: #f3f4f6;
+            border: 1px solid #e2e8f0;
+            padding: 0 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            height: 42px;
+            align-self: flex-end;
+        }
+
+        /* Контейнер карточек */
+        .listings-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 28px 20px;
+        }
+
+        /* Карточка объявления */
+        .card {
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            transition: 0.25s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -12px rgba(0,0,0,0.15);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 180px;
+            background: #eef2ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2563eb;
+            font-size: 3rem;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .card-content {
+            padding: 16px;
+            flex: 1;
+        }
+
+        .card-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+        }
+
+        .card-price {
+            font-weight: 800;
+            font-size: 1.4rem;
+            color: #2563eb;
+            margin: 8px 0;
+        }
+
+        .card-category {
+            display: inline-block;
+            background: #eef2ff;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1e40af;
+        }
+
+        .card-desc {
+            font-size: 0.8rem;
+            color: #4b5563;
+            margin: 10px 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 12px;
+        }
+
+        .favorite-btn {
+            background: none;
+            border: none;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: 0.1s;
+            color: #9ca3af;
+        }
+
+        .favorite-btn.active {
+            color: #ef4444;
+        }
+
+        /* Модалка добавления */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: white;
+            max-width: 500px;
+            width: 90%;
+            border-radius: 32px;
+            padding: 24px;
+            animation: fadeUp 0.2s ease;
+        }
+
+        @keyframes fadeUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-card h2 {
+            margin-bottom: 20px;
+        }
+
+        .modal-card input, .modal-card textarea, .modal-card select {
+            width: 100%;
+            margin-bottom: 16px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            border-radius: 40px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .header { flex-direction: column; text-align: center; }
+            .filters-section { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="logo">📦 <span>Авито-клон</span> | Дом &nbsp;и&nbsp; товары</div>
+    <button class="add-btn" id="openModalBtn">➕ Подать объявление</button>
+</div>
+
+<div class="filters-section">
+    <div class="filter-group">
+        <label>🔍 Поиск</label>
+        <input type="text" id="searchInput" placeholder="Телефон, велосипед...">
+    </div>
+    <div class="filter-group">
+        <label>📂 Категория</label>
+        <select id="categoryFilter">
+            <option value="all">Все категории</option>
+            <option value="Электроника">Электроника</option>
+            <option value="Недвижимость">Недвижимость</option>
+            <option value="Транспорт">Транспорт</option>
+            <option value="Личные вещи">Личные вещи</option>
+            <option value="Услуги">Услуги</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <label>💰 Цена до (₽)</label>
+        <input type="number" id="priceMax" placeholder="Любая" value="">
+    </div>
+    <button class="search-btn" id="filterBtn">⏎ Применить</button>
+</div>
+
+<div id="listingsGrid" class="listings-container">
+    <!-- Карточки будут отрисованы через JS -->
+    <div class="empty-state">Загрузка объявлений...</div>
+</div>
+<footer>Доска бесплатных объявлений — тестовый авито-клон с имитацией базы (localStorage)</footer>
+
+<!-- Модалка добавления -->
+<div id="addModal" class="modal">
+    <div class="modal-card">
+        <h2>Новое объявление</h2>
+        <input type="text" id="title" placeholder="Название *" maxlength="50">
+        <select id="category">
+            <option value="Электроника">Электроника</option>
+            <option value="Недвижимость">Недвижимость</option>
+            <option value="Транспорт">Транспорт</option>
+            <option value="Личные вещи">Личные вещи</option>
+            <option value="Услуги">Услуги</option>
+        </select>
+        <input type="number" id="price" placeholder="Цена в ₽ *">
+        <textarea id="description" rows="3" placeholder="Описание... (необязательно)"></textarea>
+        <div class="modal-buttons">
+            <button id="closeModal" style="background:#eef2ff;">Отмена</button>
+            <button id="saveAdBtn" style="background:#2563eb; color:white;">Опубликовать</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========================== МОДЕЛЬ ДАННЫХ ==========================
+    let listings = [];      // массив объявлений
+    let favorites = new Set();   // id избранных
+
+    // Генерация случайных картинок (эмодзи / фон)
+    const images = ['📱', '🏠', '🚗', '👕', '🛠️', '💻', '📚', '🔧', '⌚', '🖥️'];
+    function getRandomImageEmoji() {
+        return images[Math.floor(Math.random() * images.length)];
+    }
+
+    // Загрузка из localStorage
+    function loadData() {
+        const stored = localStorage.getItem('avitoClone_listings');
+        if (stored) {
+            listings = JSON.parse(stored);
+        } else {
+            // Стартовые демо-объявления
+            listings = [
+                { id: Date.now()+1, title: 'iPhone 13 Pro', category: 'Электроника', price: 45000, description: 'Отличное состояние, 100% battery', createdAt: Date.now()-86400000, imageIcon: '📱' },
+                { id: Date.now()+2, title: '1-комн. квартира', category: 'Недвижимость', price: 3800000, description: 'Рядом метро, свежий ремонт', createdAt: Date.now()-172800000, imageIcon: '🏠' },
+                { id: Date.now()+3, title: 'Hyundai Solaris', category: 'Транспорт', price: 950000, description: '2019 г.в., автомат, без ДТП', createdAt: Date.now()-259200000, imageIcon: '🚗' },
+                { id: Date.now()+4, title: 'Зимняя куртка', category: 'Личные вещи', price: 4500, description: 'Размер M, новая', createdAt: Date.now()-345600000, imageIcon: '👕' },
+                { id: Date.now()+5, title: 'Ремонт квартир', category: 'Услуги', price: 15000, description: 'Косметический ремонт под ключ', createdAt: Date.now()-432000000, imageIcon: '🛠️' }
+            ];
+            listings.forEach(ad => { if(!ad.imageIcon) ad.imageIcon = getRandomImageEmoji(); });
+            saveToLocal();
+        }
+
+        const favStore = localStorage.getItem('avitoClone_favorites');
+        if (favStore) {
+            const arr = JSON.parse(favStore);
+            favorites.clear();
+            arr.forEach(id => favorites.add(id));
+        } else {
+            favorites.clear();
+        }
+    }
+
+    function saveToLocal() {
+        localStorage.setItem('avitoClone_listings', JSON.stringify(listings));
+    }
+
+    function saveFavorites() {
+        localStorage.setItem('avitoClone_favorites', JSON.stringify([...favorites]));
+    }
+
+    // Рендер
+    function renderListings(filteredList) {
+        const container = document.getElementById('listingsGrid');
+        if (!filteredList || filteredList.length === 0) {
+            container.innerHTML = `<div class="empty-state">😕 Ничего не найдено. Измените фильтры или добавьте объявление.</div>`;
+            return;
+        }
+
+        container.innerHTML = '';
+        filteredList.forEach(ad => {
+            const isFav = favorites.has(ad.id);
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.setAttribute('data-id', ad.id);
+            // клик по карточке (кроме fav кнопки) - просмотр в модалке
+            card.addEventListener('click', (e) => {
+                if(e.target.closest('.favorite-btn')) return;
+                showDetailsModal(ad);
+            });
+
+            card.innerHTML = `
+                <div class="card-img" style="font-size: 3rem; background:#eef2ff; display:flex; align-items:center; justify-content:center;">
+                    ${ad.imageIcon || '📦'}
+                </div>
+                <div class="card-content">
+                    <div class="card-title">${escapeHtml(ad.title)}</div>
+                    <div class="card-price">${Number(ad.price).toLocaleString()} ₽</div>
+                    <span class="card-category">${escapeHtml(ad.category)}</span>
+                    <div class="card-desc">${escapeHtml(ad.description || 'Без описания')}</div>
+                    <div class="card-footer">
+                        <small>🕒 ${new Date(ad.createdAt).toLocaleDateString()}</small>
+                        <button class="favorite-btn ${isFav ? 'active' : ''}" data-id="${ad.id}">❤️</button>
+                    </div>
+                </div>
+            `;
+
+            const favBtn = card.querySelector('.favorite-btn');
+            favBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleFavorite(ad.id);
+                renderListings(getFilteredListings());  // перерисовка
+            });
+            container.appendChild(card);
+        });
+    }
+
+    function toggleFavorite(id) {
+        if (favorites.has(id)) {
+            favorites.delete(id);
+        } else {
+            favorites.add(id);
+        }
+        saveFavorites();
+    }
+
+    // Фильтрация + поиск
+    function getFilteredListings() {
+        const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
+        const category = document.getElementById('categoryFilter').value;
+        let maxPrice = document.getElementById('priceMax').value;
+        maxPrice = maxPrice === '' ? Infinity : Number(maxPrice);
+
+        return listings.filter(ad => {
+            const matchSearch = searchText === '' || ad.title.toLowerCase().includes(searchText) || (ad.description && ad.description.toLowerCase().includes(searchText));
+            const matchCat = category === 'all' || ad.category === category;
+            const matchPrice = ad.price <= maxPrice;
+            return matchSearch && matchCat && matchPrice;
+        }).sort((a,b) => b.createdAt - a.createdAt);
+    }
+
+    function escapeHtml(str) {
+        if(!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if(m === '&') return '&amp;';
+            if(m === '<') return '&lt;';
+            if(m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    // Добавить объявление
+    function addNewAd() {
+        const title = document.getElementById('title').value.trim();
+        const category = document.getElementById('category').value;
+        const price = parseFloat(document.getElementById('price').value);
+        const description = document.getElementById('description').value.trim();
+
+        if (!title || title.length < 3) {
+            alert('Название должно быть не менее 3 символов');
+            return false;
+        }
+        if (isNaN(price) || price <= 0) {
+            alert('Укажите корректную цену');
+            return false;
+        }
+
+        const newAd = {
+            id: Date.now(),
+            title: title,
+            category: category,
+            price: price,
+            description: description || '',
+            createdAt: Date.now(),
+            imageIcon: getRandomImageEmoji()
+        };
+        listings.unshift(newAd);
+        saveToLocal();
+        // очистка формы
+        document.getElementById('title').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('description').value = '';
+        closeModal();
+        renderListings(getFilteredListings());
+        return true;
+    }
+
+    // Модалка просмотра деталей
+    function showDetailsModal(ad) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal-card" style="max-width:450px;">
+                <h2>${escapeHtml(ad.title)}</h2>
+                <div style="font-size: 4rem; text-align:center; margin:10px 0;">${ad.imageIcon || '📦'}</div>
+                <p><strong>Категория:</strong> ${escapeHtml(ad.category)}</p>
+                <p><strong>Цена:</strong> ${Number(ad.price).toLocaleString()} ₽</p>
+                <p><strong>Описание:</strong> ${escapeHtml(ad.description || 'Нет описания')}</p>
+                <p><strong>Дата:</strong> ${new Date(ad.createdAt).toLocaleString()}</p>
+                <div class="modal-buttons">
+                    <button id="delAdBtn" style="background:#fee2e2; color:#b91c1c;">🗑 Удалить</button>
+                    <button id="closeDetailBtn" style="background:#2563eb; color:white;">Закрыть</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        const closeDetail = () => modal.remove();
+        document.getElementById('closeDetailBtn').onclick = closeDetail;
+        const delBtn = document.getElementById('delAdBtn');
+        if (delBtn) {
+            delBtn.onclick = () => {
+                if(confirm('Удалить объявление навсегда?')) {
+                    listings = listings.filter(item => item.id !== ad.id);
+                    favorites.delete(ad.id);
+                    saveToLocal();
+                    saveFavorites();
+                    closeDetail();
+                    renderListings(getFilteredListings());
+                }
+            };
+        }
+        modal.addEventListener('click', (e) => {
+            if(e.target === modal) closeDetail();
+        });
+    }
+
+    // Модалка добавления
+    const modalElem = document.getElementById('addModal');
+    function openModal() { modalElem.style.display = 'flex'; }
+    function closeModal() { modalElem.style.display = 'none'; }
+
+    // Инициализация событий
+    document.getElementById('openModalBtn').onclick = openModal;
+    document.getElementById('closeModal').onclick = closeModal;
+    document.getElementById('saveAdBtn').onclick = () => { addNewAd(); };
+    document.getElementById('filterBtn').onclick = () => {
+        renderListings(getFilteredListings());
+    };
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+        if(e.key === 'Enter') renderListings(getFilteredListings());
+    });
+    window.onclick = (e) => { if(e.target === modalElem) closeModal(); };
+
+    // Запуск
+    loadData();
+    renderListings(getFilteredListings());
+</script>
+</body>
+</html>
